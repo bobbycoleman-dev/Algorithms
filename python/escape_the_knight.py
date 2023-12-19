@@ -57,14 +57,47 @@ def create_squares():
 
     return squares
 
+    return squares
+
+
+def create_square_colors():
+    squares = {}
+    n = ["8", "7", "6", "5", "4", "3", "2", "1"]
+    l = ["a", "b", "c", "d", "e", "f", "g", "h"]
+
+    for i in range(8):
+        for j in range(8):
+            if int(n[i]) % 2 == 0:
+                if int(n[j]) % 2 == 0:
+                    squares[l[i] + n[j]] = "w"
+                else:
+                    squares[l[i] + n[j]] = "b"
+            else:
+                if int(n[j]) % 2 == 0:
+                    squares[l[i] + n[j]] = "b"
+                else:
+                    squares[l[i] + n[j]] = "w"
+
+    return squares
+
 
 board = create_board()
 squares = create_squares()
+square_colors = create_square_colors()
+
+
+# pprint(square_colors)
 
 
 def convert_to_square_coord(coord):
     return list(squares.keys())[list(squares.values()).index(coord)]
 
+
+def get_square_color(square):
+    return square_colors[square]
+
+
+# pprint(get_square_color("g3"))
 
 king_moves = {
     "left_up": [-1, -1],
@@ -127,48 +160,87 @@ def knight_legal_moves(knight_square):
     return legal_moves
 
 
-def choose_king_moves(king_square, knight_square, number_of_moves):
-    king_moves_list = []
-    knight_moves_list = []
+def two_moves_ahead(knight_square):
+    first_moves = knight_legal_moves(knight_square)
+    second_moves = []
+    for move in first_moves:
+        second_moves.append(knight_legal_moves(move))
 
-    nl = len(knight_moves_list)
+    return [item for move_list in second_moves for item in move_list]
 
-    new_king_square = king_square
-    new_knight_square = knight_square
 
-    # Creates move lists
-    for i in range(number_of_moves):
-        # Get list of possible King moves, make a random choice
-        possible_king_moves = king_legal_moves(new_king_square)
-        king_move = random.choice(possible_king_moves)
+def filter_moves(king_move, knight_move):
+    possible_king_moves = king_legal_moves(king_move)
+    possible_knight_moves = knight_legal_moves(knight_move)
+    knight_square_color = square_colors[knight_move]
 
-        # Prevent King from taking a square the Knight is currently on
-        if nl > 0 and king_move == knight_moves_list[nl - 1]:
-            possible_king_moves.remove(knight_moves_list[nl - 1])
-            king_move = random.choice(possible_king_moves)
+    final_king_moves = []
 
-        # Add King move to move list
-        king_moves_list.append(king_move)
-        new_king_square = king_move
+    for move in possible_king_moves:
+        if square_colors[move] != knight_square_color:
+            final_king_moves.append(move)
 
-        # Get list of possible Knight moves, make a random choice
-        possible_knight_moves = knight_legal_moves(new_knight_square)
-        knight_move = random.choice(possible_knight_moves)
+    return {
+        # "King Moves": possible_king_moves,
+        "Knight Moves": possible_knight_moves,
+        "Knight Square Color": knight_square_color,
+        "Final King Moves": final_king_moves,
+    }
 
-        # Prevent Knight from taking the square the King is currently on
-        if knight_move == king_move:
-            possible_knight_moves.remove(king_move)
-            knight_move = random.choice(possible_knight_moves)
 
-        #  Add Knight move to move list
-        knight_moves_list.append(knight_move)
-        new_knight_square = knight_move
+# pprint(filter_moves("a8", "h1"))
+# pprint(filter_moves("b8", "f2"))
+# pprint(filter_moves("a7", "d3"))
+# pprint(filter_moves("b8", "b2"))
+# pprint(filter_moves("a7", "c4"))
+# pprint(filter_moves("b8", "a3"))
+# pprint(filter_moves("a7", "b5"))
 
-        # Check if Knights move puts the King in Check
-        if king_move in knight_legal_moves(knight_move):
-            king_moves_list[i] = king_moves_list[i] + "-CHECK"
+# print(square_colors["a7"])
 
-    return {"King Moves": king_moves_list, "Knight Moves": knight_moves_list}
+
+# def choose_king_moves(king_square, knight_square, number_of_moves):
+#     king_moves_list = []
+#     knight_moves_list = []
+
+#     nl = len(knight_moves_list)
+
+#     new_king_square = king_square
+#     new_knight_square = knight_square
+
+#     # Creates move lists
+#     for i in range(number_of_moves):
+#         # Get list of possible King moves, make a random choice
+#         possible_king_moves = king_legal_moves(new_king_square)
+#         king_move = random.choice(possible_king_moves)
+
+#         # Prevent King from taking a square the Knight is currently on
+#         if nl > 0 and king_move == knight_moves_list[nl - 1]:
+#             possible_king_moves.remove(knight_moves_list[nl - 1])
+#             king_move = random.choice(possible_king_moves)
+
+#         # Add King move to move list
+#         king_moves_list.append(king_move)
+#         new_king_square = king_move
+
+#         # Get list of possible Knight moves, make a random choice
+#         possible_knight_moves = knight_legal_moves(new_knight_square)
+#         knight_move = random.choice(possible_knight_moves)
+
+#         # Prevent Knight from taking the square the King is currently on
+#         if knight_move == king_move:
+#             possible_knight_moves.remove(king_move)
+#             knight_move = random.choice(possible_knight_moves)
+
+#         #  Add Knight move to move list
+#         knight_moves_list.append(knight_move)
+#         new_knight_square = knight_move
+
+#         # Check if Knights move puts the King in Check
+#         if king_move in knight_legal_moves(knight_move):
+#             king_moves_list[i] = king_moves_list[i] + "-CHECK"
+
+#     return {"King Moves": king_moves_list, "Knight Moves": knight_moves_list}
 
 
 # pprint(board)
@@ -177,18 +249,51 @@ def choose_king_moves(king_square, knight_square, number_of_moves):
 # pprint(knight_legal_moves("d4"))
 
 
-def play_game():
-    king_squares = ["a8", "e5", "g7", "a1"]
-    knight_squares = ["h1", "f2", "d4", "b1"]
-    number_of_moves = 6
-    results = {}
+# def play_game():
+#     king_squares = ["a8", "e5", "g7", "a1"]
+#     knight_squares = ["h1", "f2", "d4", "b1"]
+#     number_of_moves = 6
+#     results = {}
 
-    for i in range(len(king_squares)):
-        results[f"Game {i + 1}"] = choose_king_moves(
-            king_squares[i], knight_squares[i], number_of_moves
-        )
+#     for i in range(len(king_squares)):
+#         results[f"Game {i + 1}"] = choose_king_moves(
+#             king_squares[i], knight_squares[i], number_of_moves
+#         )
 
-    return results
+#     return results
 
 
-pprint(play_game())
+# pprint(play_game())
+
+
+#! FINAL SOLUTION
+def choose_king_moves(king_square, knight_square, number_of_moves):
+    king_moves_list = []
+    new_king_square = king_square
+
+    # Creates move lists
+    for i in range(number_of_moves):
+        # Get list of possible King moves
+        possible_king_moves = king_legal_moves(new_king_square)
+
+        # Get current Knight square color
+        knight_square_color = square_colors[knight_square]
+
+        final_king_moves = []
+
+        for move in possible_king_moves:
+            if len(king_moves_list) == 0:
+                if square_colors[move] != knight_square_color:
+                    final_king_moves.append(move)
+            else:
+                if (
+                    square_colors[move]
+                    != square_colors[king_moves_list[len(king_moves_list) - 1]]
+                ):
+                    final_king_moves.append(move)
+
+        king_move = final_king_moves[0]
+
+        # Add King move to move list
+        king_moves_list.append(king_move)
+        new_king_square = king_move
