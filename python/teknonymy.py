@@ -55,3 +55,68 @@ teknonym : str # that's the field you should mutate if it's relevant to do so
 sex : str
 children : list[dict] # list of children, possibly empty
 """
+import datetime
+
+family_tree = {
+    "sex": "m",
+    "teknonym": "",
+    "children": [
+        {
+            "sex": "f",
+            "teknonym": "",
+            "children": [
+                {
+                    "sex": "f",
+                    "teknonym": "",
+                    "children": [],
+                    "name": "h",
+                    "date_of_birth": datetime.datetime(1047, 1, 1, 0, 0),
+                }
+            ],
+            "name": "b",
+            "date_of_birth": datetime.datetime(1020, 1, 1, 0, 0),
+        },
+        {
+            "sex": "m",
+            "teknonym": "",
+            "children": [],
+            "name": "c",
+            "date_of_birth": datetime.datetime(1021, 2, 1, 0, 0),
+        },
+        {
+            "sex": "m",
+            "teknonym": "",
+            "children": [
+                {
+                    "sex": "f",
+                    "teknonym": "",
+                    "children": [],
+                    "name": "e",
+                    "date_of_birth": datetime.datetime(1043, 11, 1, 0, 0),
+                },
+                {
+                    "sex": "f",
+                    "teknonym": "",
+                    "children": [],
+                    "name": "f",
+                    "date_of_birth": datetime.datetime(1045, 1, 1, 0, 0),
+                },
+                {
+                    "sex": "m",
+                    "teknonym": "",
+                    "children": [],
+                    "name": "g",
+                    "date_of_birth": datetime.datetime(1046, 1, 1, 0, 0),
+                },
+            ],
+            "name": "d",
+            "date_of_birth": datetime.datetime(1023, 11, 28, 0, 0),
+        },
+    ],
+    "name": "a",
+    "date_of_birth": datetime.datetime(1000, 1, 1, 0, 0),
+}
+
+
+def teknonymize(family_tree) -> None:
+    pass
